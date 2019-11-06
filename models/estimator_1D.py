@@ -142,3 +142,11 @@ class Estimator1D(BaseModule):
         o = h
 
         return o
+
+# test
+if __name__ == "__main__":
+    masknet = MaskedFullyConnection(mask_type='A', in_channels=1, out_channels=2, in_features=10, out_features=20)
+    x = torch.randn((1,1,10))
+    y = masknet(x)
+    print(y.size())
+    print(masknet.mask)
