@@ -99,10 +99,10 @@ class Decoder(BaseModule):
 
         # Convolutional network
         self.conv = nn.Sequential(
+            UpsampleBlock(channel_in=128, channel_out=64, activation_fn=activation_fn),
             UpsampleBlock(channel_in=64, channel_out=32, activation_fn=activation_fn),
             UpsampleBlock(channel_in=32, channel_out=16, activation_fn=activation_fn),
-            UpsampleBlock(channel_in=16, channel_out=8, activation_fn=activation_fn),
-            nn.Conv2d(in_channels=8, out_channels=2, kernel_size=1)
+            nn.Conv2d(in_channels=16, out_channels=1, kernel_size=1)
         )
 
     def forward(self, x):

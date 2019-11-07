@@ -13,7 +13,7 @@ class SegLoss(BaseModule):
         Class constructor.
         """
         super(SegLoss, self).__init__()
-        self.loss_fn = torch.nn.BCELoss()
+        self.loss_fn = torch.nn.BCEWithLogitsLoss()
 
     def forward(self, x, x_r):
         # type: (torch.Tensor, torch.Tensor) -> torch.Tensor

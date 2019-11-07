@@ -33,7 +33,7 @@ class IOWA96(Dataset):
         tmp_img /= np.std(tmp_img)
         tmp_gt = self.seg_gt[i,]
         tmp_img = torch.from_numpy(tmp_img.astype(np.float32)).unsqueeze(0)
-        tmp_gt = torch.from_numpy(tmp_gt.astype(np.float32))
+        tmp_gt = torch.from_numpy(tmp_gt.astype(np.float32)).unsqueeze(0)
 
         return tmp_img, tmp_gt
 

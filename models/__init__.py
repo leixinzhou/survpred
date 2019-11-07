@@ -1,2 +1,2 @@
-from models.LSA_mnist import LSAMNIST
+from models.LSA_iowa96 import LSAIOWA96
 
