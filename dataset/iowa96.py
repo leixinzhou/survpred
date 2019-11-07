@@ -42,10 +42,10 @@ if __name__ == "__main__":
     img_dir = "data/iowa_surv/IOWA96_np/tr_img.npy"
     gt_dir = "data/iowa_surv/IOWA96_np/tr_seg_gt.npy"
     dataset = IOWA96(img_dir, gt_dir)
-    loader = DataLoader(dataset)
+    loader = DataLoader(dataset, shuffle=True)
     for _, (img, gt) in enumerate(loader):
         fig, axes = plt.subplots(1,2)
-        pos = axes[0].imshow(img.squeeze())
+        pos = axes[0].imshow(img.squeeze(), cmap='gray')
         fig.colorbar(pos, ax=axes[0])
         pos = axes[1].imshow(gt.squeeze())
         fig.colorbar(pos, ax=axes[1])
