@@ -6,8 +6,8 @@ import torch
 import torch.nn as nn
 
 from models.base import BaseModule
-from models.blocks_2d import DownsampleBlock
-from models.blocks_2d import UpsampleBlock
+from models.blocks_3d import DownsampleBlock
+from models.blocks_3d import UpsampleBlock
 from models.estimator_1D import Estimator1D
 
 
@@ -104,7 +104,7 @@ class Decoder(BaseModule):
             UpsampleBlock(channel_in=128, channel_out=64, activation_fn=activation_fn),
             UpsampleBlock(channel_in=64, channel_out=32, activation_fn=activation_fn),
             UpsampleBlock(channel_in=32, channel_out=16, activation_fn=activation_fn),
-            nn.Conv2d(in_channels=16, out_channels=1, kernel_size=1)
+            nn.Conv3d(in_channels=16, out_channels=1, kernel_size=1)
         )
 
     def forward(self, x):
