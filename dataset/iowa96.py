@@ -4,6 +4,36 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 import matplotlib.pyplot as plt
+import csv
+import random, os
+
+TR_NB = 48
+VAL_NB = 5
+ROOT_DIR = "./Iowa_96_cases_binary_selected/"
+IMG_NAME = "InputCTPrimary_ROI.nii.gz"
+GT_NAME = "GTV_Primary_ROI_CT_ST.nii.gz"
+OUTPUT_DIR = "./IOWA96_np/"
+
+surv_list = []
+dead_list = []
+
+with open('Binary_96_selected.csv') as csvfile:
+    reader  = csv.reader(csvfile)
+    next(reader)
+    for row in reader:
+        if row[-1] == '1':
+            surv_list.append(row[0])
+        else:
+            dead_list.append(row[0])
+print("Surv case # :", len(surv_list))
+print("Dead case # :", len(dead_list))
+
+random.seed(0)
+random.shuffle(surv_list)
+random.shuffle(dead_list)
+
+tr_case = surv_list[:TR_NB]
+val_case = surv_list[TR_NB:TR_NB+VAL_NB]
 
 class IOWA96(Dataset):
     """

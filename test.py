@@ -1,13 +1,15 @@
 import argparse
 from argparse import Namespace
-
+from torch.utils.data import DataLoader
+import torch
 
 from models import LSAIOWA96
-
-from result_helpers import OneClassResultHelper
-from result_helpers import VideoAnomalyDetectionResultHelper
-from utils import set_random_seed
-
+from dataset import IOWA96
+# from result_helpers import OneClassResultHelper
+# from result_helpers import VideoAnomalyDetectionResultHelper
+# from utils import set_random_seed
+import matplotlib.pyplot as plt
+from vis import show_img_contour
 
 def test_iowa96():
     # type: () -> None
@@ -16,53 +18,35 @@ def test_iowa96():
     """
 
     # Build dataset and model
-    dataset = IOWA96(path='data/MNIST')
-    model = LSAIOWA96(input_shape=dataset.shape, code_length=64, cpd_channels=100).cuda().eval()
+    val_dataset = IOWA96(img_dir="data/iowa_surv/IOWA96_np/val_img.npy", 
+                        seg_gt_dir="data/iowa_surv/IOWA96_np/val_seg_gt.npy")
+    val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=0)
+    # network
+    net = LSAIOWA96(input_shape=(1, 96, 96), code_length=64, cpd_channels=100).cuda()
+    net.load_state_dict(torch.load("run/no_aug/model_best.pth.tar")["state_dict"])
+    net.eval()
+    for step, (img, seg_gt) in enumerate(val_loader, 1):
+        img, seg_gt = img.cuda(), seg_gt.cuda()
+        x_r, z, z_dist = net(img)
+        x_r = x_r > 0.
+        
+        fig, axes = plt.subplots(1,3, figsize=(8,4))
+        img_np = img.squeeze().detach().cpu().numpy()
+        seg_gt_np = seg_gt.squeeze().detach().cpu().numpy()
+        seg_pred_np = x_r.squeeze().detach().cpu().numpy()
+        for i in range(3):
+            axes[i].set(xticks=[], yticks=[])
+        axes[0].imshow(img_np, cmap='gray')
+        axes[0].set_title('Image')
+        axes[1].set_title('GT')
+        show_img_contour(img_np, seg_gt_np, axes[1], 'r')
+        axes[2].set_title('Pred')
+        show_img_contour(img_np, seg_pred_np, axes[2], 'r')
 
-    # Set up result helper and perform test
-    helper = OneClassResultHelper(dataset, model, checkpoints_dir='checkpoints/mnist/', output_file='IOWA96.txt')
-    helper.test_one_class_classification()
-
-
-
-
-
-def parse_arguments():
-    # type: () -> Namespace
-    """
-    Argument parser.
-
-    :return: the command line arguments.
-    """
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('dataset', type=str,
-                        help='The name of the dataset to perform tests on.'
-                             'Choose among `mnist`, `cifar10`, `ucsd-ped2`, `shanghaitech`', metavar='')
-
-    return parser.parse_args()
-
-
-def main():
-
-    # Parse command line arguments
-    args = parse_arguments()
-
-    # Lock seeds
-    set_random_seed(30101990)
-
-    # Run test
-    if args.dataset == 'mnist':
-        test_mnist()
-    elif args.dataset == 'cifar10':
-        test_cifar()
-    elif args.dataset == 'ucsd-ped2':
-        test_ucsdped2()
-    elif args.dataset == 'shanghaitech':
-        test_shanghaitech()
-    else:
-        raise ValueError(f'Unknown dataset: {args.dataset}')
+        plt.savefig('run/no_aug/vis/val/'+str(step)+".png", dpi=150)
+        plt.close()
 
 
 # Entry point
 if __name__ == '__main__':
-    main()
+    test_iowa96()

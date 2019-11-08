@@ -107,9 +107,9 @@ class DownsampleBlock(BaseBlock):
         self.stride = stride
 
         # Convolutions
-        self.conv1a = MaskedConv3d(in_channels=channel_in, out_channels=channel_out, kernel_size=3,
+        self.conv1a = nn.Conv3d(in_channels=channel_in, out_channels=channel_out, kernel_size=3,
                                    padding=1, stride=stride, bias=use_bias)
-        self.conv1b = MaskedConv3d(in_channels=channel_out, out_channels=channel_out, kernel_size=3,
+        self.conv1b = nn.Conv3d(in_channels=channel_out, out_channels=channel_out, kernel_size=3,
                                    padding=1, stride=1, bias=use_bias)
         self.conv2a = nn.Conv3d(in_channels=channel_in, out_channels=channel_out, kernel_size=1,
                                 padding=0, stride=stride, bias=use_bias)

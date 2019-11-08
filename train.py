@@ -10,6 +10,10 @@ from models import LSAIOWA96
 from dataset import IOWA96
 from models.loss_functions import LSALoss
 
+PATH = "run/no_aug/"
+if not os.path.exists(PATH):
+    os.makedirs(PATH)
+
 def save_checkpoint(states,  path, filename='model_best.pth.tar'):
     if not os.path.exists(path):
         os.makedirs(path)
@@ -33,7 +37,7 @@ def train_iowa96():
     optimizer = optim.Adam(net.parameters(), lr=1e-4)
     loss_fn = LSALoss(cpd_channels=100)
     # training tracker
-    writer = SummaryWriter("run/")
+    writer = SummaryWriter("run/no_aug/")
 
     best_loss = np.float("inf")
     for epoch in range(1000):
@@ -71,7 +75,7 @@ def train_iowa96():
                     'best_loss': best_loss,
                     'optimizer': optimizer.state_dict()
                 },
-                path="run/",
+                path="run/no_aug/",
             )
 
 if __name__ == "__main__":

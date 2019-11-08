@@ -28,7 +28,7 @@ class Encoder(BaseModule):
         self.input_shape = input_shape
         self.code_length = code_length
 
-        c, h, w = input_shape
+        c, h, w, d = input_shape
 
         activation_fn = nn.LeakyReLU()
 
@@ -37,8 +37,9 @@ class Encoder(BaseModule):
             DownsampleBlock(channel_in=c, channel_out=32, activation_fn=activation_fn),
             DownsampleBlock(channel_in=32, channel_out=64, activation_fn=activation_fn),
             DownsampleBlock(channel_in=64, channel_out=128, activation_fn=activation_fn),
+            DownsampleBlock(channel_in=128, channel_out=256, activation_fn=activation_fn),
         )
-        self.deepest_shape = (128, h // 8, w // 8)
+        self.deepest_shape = (256, h // 16, w // 16, d // 16)
 
         # FC network
         self.fc = nn.Sequential(
@@ -99,6 +100,7 @@ class Decoder(BaseModule):
 
         # Convolutional network
         self.conv = nn.Sequential(
+            UpsampleBlock(channel_in=256, channel_out=128, activation_fn=activation_fn),
             UpsampleBlock(channel_in=128, channel_out=64, activation_fn=activation_fn),
             UpsampleBlock(channel_in=64, channel_out=32, activation_fn=activation_fn),
             UpsampleBlock(channel_in=32, channel_out=16, activation_fn=activation_fn),
