@@ -3,7 +3,7 @@ import torch.nn as nn
 
 from models.loss_functions.autoregression_loss import AutoregressionLoss
 from models.loss_functions.reconstruction_loss import ReconstructionLoss
-from models.loss_functions.seg_loss import SegLoss
+from models.loss_functions.seg_loss import SegCELoss, SegDiceLoss
 
 
 class LSALoss(nn.Module):
@@ -25,7 +25,7 @@ class LSALoss(nn.Module):
         self.lam = lam
 
         # Set up loss modules
-        self.reconstruction_loss_fn = SegLoss()
+        self.reconstruction_loss_fn = SegDiceLoss()
         self.autoregression_loss_fn = AutoregressionLoss(cpd_channels)
 
         # Numerical variables

@@ -56,6 +56,7 @@ class IOWA96(Dataset):
         return len(self.case_list)
 
     def __getitem__(self, i):
+
         img = os.path.join(ROOT_DIR, 'Iowa_96_cases_binary_selected', self.case_list[i], IMG_NAME)
         gt = os.path.join(ROOT_DIR, 'Iowa_96_cases_binary_selected', self.case_list[i], GT_NAME)
         img = sitk.GetArrayFromImage(sitk.ReadImage(img))
@@ -63,6 +64,22 @@ class IOWA96(Dataset):
         img = np.clip(img, -500, 200)
         img -= np.mean(img)
         img /= np.std(img)
+        rn = random.uniform(0,1)
+        if self.train:
+            if rn > 0.66:
+                img = np.rot90(img, axes=(1,2))
+                gt = np.rot90(gt, axes=(1,2))
+            elif rn < 0.33:
+                img = np.rot90(img, axes=(2,1))
+                gt = np.rot90(gt, axes=(2,1))
+            rn = random.uniform(0,1)
+            if rn > 0.5:
+                img = np.fliplr(img)
+                gt = np.fliplr(gt)
+            rn = random.uniform(0,1)
+            if rn > 0.5:
+                img = np.flipud(img)
+                gt = np.flipud(gt)
         img = torch.from_numpy(img.astype(np.float32)).unsqueeze(0)
         gt = torch.from_numpy(gt.astype(np.float32)).unsqueeze(0)
 

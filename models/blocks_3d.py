@@ -53,7 +53,7 @@ def residual_op(x, functions, bns, activation_fn):
 
 class BaseBlock(BaseModule):
     """ Base class for all blocks. """
-    def __init__(self, channel_in, channel_out, activation_fn, use_bn=True, use_bias=True):
+    def __init__(self, channel_in, channel_out, activation_fn, use_bn=True, use_bias=False):
         # type: (int, int, Module, bool, bool) -> None
         """
         Class constructor.
@@ -91,7 +91,7 @@ class BaseBlock(BaseModule):
 
 class DownsampleBlock(BaseBlock):
     """ Implements a Downsampling block for videos (Fig. 1ii). """
-    def __init__(self, channel_in, channel_out, activation_fn, stride, use_bn=True, use_bias=False):
+    def __init__(self, channel_in, channel_out, activation_fn, use_bn=True, use_bias=False):
         # type: (int, int, Module, Tuple[int, int, int], bool, bool) -> None
         """
         Class constructor.
@@ -104,15 +104,14 @@ class DownsampleBlock(BaseBlock):
         :param use_bias: whether or not to use bias.
         """
         super(DownsampleBlock, self).__init__(channel_in, channel_out, activation_fn, use_bn, use_bias)
-        self.stride = stride
 
         # Convolutions
         self.conv1a = nn.Conv3d(in_channels=channel_in, out_channels=channel_out, kernel_size=3,
-                                   padding=1, stride=stride, bias=use_bias)
+                                   padding=1, stride=2, bias=use_bias)
         self.conv1b = nn.Conv3d(in_channels=channel_out, out_channels=channel_out, kernel_size=3,
                                    padding=1, stride=1, bias=use_bias)
         self.conv2a = nn.Conv3d(in_channels=channel_in, out_channels=channel_out, kernel_size=1,
-                                padding=0, stride=stride, bias=use_bias)
+                                padding=0, stride=2, bias=use_bias)
 
         # Batch Normalization layers
         self.bn1a = self.get_bn()
@@ -136,7 +135,7 @@ class DownsampleBlock(BaseBlock):
 
 class UpsampleBlock(BaseBlock):
     """ Implements a Upsampling block for videos (Fig. 1ii). """
-    def __init__(self, channel_in, channel_out, activation_fn, stride, output_padding, use_bn=True, use_bias=False):
+    def __init__(self, channel_in, channel_out, activation_fn, use_bn=True, use_bias=False):
         # type: (int, int, Module, Tuple[int, int, int], Tuple[int, int, int], bool, bool) -> None
         """
         Class constructor.
@@ -150,16 +149,14 @@ class UpsampleBlock(BaseBlock):
         :param use_bias: whether or not to use bias.
         """
         super(UpsampleBlock, self).__init__(channel_in, channel_out, activation_fn, use_bn, use_bias)
-        self.stride = stride
-        self.output_padding = output_padding
 
         # Convolutions
-        self.conv1a = nn.ConvTranspose3d(channel_in, channel_out, kernel_size=5,
-                                         padding=2, stride=stride, output_padding=output_padding, bias=use_bias)
+        self.conv1a = nn.ConvTranspose3d(channel_in, channel_out, kernel_size=2,
+                                          stride=2, bias=use_bias)
         self.conv1b = nn.Conv3d(in_channels=channel_out, out_channels=channel_out, kernel_size=3,
                                 padding=1, stride=1, bias=use_bias)
-        self.conv2a = nn.ConvTranspose3d(channel_in, channel_out, kernel_size=5,
-                                         padding=2, stride=stride, output_padding=output_padding, bias=use_bias)
+        self.conv2a = nn.ConvTranspose3d(channel_in, channel_out, kernel_size=2,
+                                         stride=2, bias=use_bias)
 
         # Batch Normalization layers
         self.bn1a = self.get_bn()

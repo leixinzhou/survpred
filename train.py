@@ -25,17 +25,15 @@ def train_iowa96():
     """
     Train on iowa96.
     """
-    tr_dataset = IOWA96(img_dir="data/iowa_surv/IOWA96_np/tr_img.npy", 
-                        seg_gt_dir="data/iowa_surv/IOWA96_np/tr_seg_gt.npy")
-    val_dataset = IOWA96(img_dir="data/iowa_surv/IOWA96_np/val_img.npy", 
-                        seg_gt_dir="data/iowa_surv/IOWA96_np/val_seg_gt.npy")
-    tr_loader = DataLoader(tr_dataset, batch_size=32, shuffle=True, num_workers=0)
-    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=0)
+    tr_dataset = IOWA96(train=True)
+    val_dataset = IOWA96(train=False)
+    tr_loader = DataLoader(tr_dataset, batch_size=12, shuffle=True, num_workers=0)
+    val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, num_workers=0)
     # network
-    net = LSAIOWA96(input_shape=(1, 96, 96), code_length=64, cpd_channels=100).cuda()
+    net = LSAIOWA96(input_shape=(1, 48, 96, 96), code_length=64, cpd_channels=100).cuda()
     # optimizer
-    optimizer = optim.Adam(net.parameters(), lr=1e-4)
-    loss_fn = LSALoss(cpd_channels=100)
+    optimizer = optim.Adam(net.parameters(), lr=1e-3)
+    loss_fn = LSALoss(cpd_channels=100, lam=0)
     # training tracker
     writer = SummaryWriter("run/no_aug/")
 
