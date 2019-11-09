@@ -34,7 +34,9 @@ class Encoder(BaseModule):
 
         # Convolutional network
         self.conv = nn.Sequential(
-            DownsampleBlock(channel_in=c, channel_out=32, activation_fn=activation_fn),
+            nn.Conv3d(in_channels=c, out_channels=16, kernel_size=3, padding=1),
+            activation_fn,
+            DownsampleBlock(channel_in=16, channel_out=32, activation_fn=activation_fn),
             DownsampleBlock(channel_in=32, channel_out=64, activation_fn=activation_fn),
             DownsampleBlock(channel_in=64, channel_out=128, activation_fn=activation_fn),
             DownsampleBlock(channel_in=128, channel_out=256, activation_fn=activation_fn),

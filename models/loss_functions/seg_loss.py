@@ -50,7 +50,8 @@ class SegDiceLoss(BaseModule):
         x_r = torch.sigmoid(x_r).unsqueeze(1)
         x = x.unsqueeze(1)
 
-        dice_array = torch.stack([1. - 2.*torch.sum(x_r[i,] * x[i,]) / (torch.sum(x_r[i,]) + torch.sum(x[i,])) for i in range(x.size(0))])
+        dice_array = torch.stack([1. - 2. * (torch.sum(x_r[i,] * x[i,]) + self.smooth) / (torch.sum(x_r[i,]) + \
+                            torch.sum(x[i,]) + self.smooth) for i in range(x.size(0))])
         return torch.mean(dice_array)
 
 
